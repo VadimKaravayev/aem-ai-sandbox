@@ -1,0 +1,7 @@
+.idea/
+stuff/
+tasks/
+CLAUDE.md
+.venv/
+.env
+__pycache__/

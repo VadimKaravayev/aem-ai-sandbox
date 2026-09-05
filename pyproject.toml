@@ -1,0 +1,7 @@
+[project]
+name = "aem-ai-sandbox"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "openai>=3.8.0",
+]
