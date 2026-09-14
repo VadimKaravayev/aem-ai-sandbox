@@ -2,6 +2,7 @@
 stuff/
 tasks/
 CLAUDE.md
+.claude/
 .venv/
 .env
 __pycache__/
