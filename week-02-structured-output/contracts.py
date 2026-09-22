@@ -30,3 +30,9 @@ class AemDiagnostic(BaseModel):
             "Lower it when the supplied context is insufficient."
         ),
     )
+
+class DiagnosticRequest(BaseModel):
+    context: str = Field(
+        min_length=1,
+        description="Raw AEM diagnostic context: log lines, bundle state, console output",
+    )
