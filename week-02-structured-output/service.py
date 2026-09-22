@@ -1,4 +1,5 @@
 from openai import OpenAI
+from pydantic import ValidationError
 
 from contracts import AemDiagnostic
 
@@ -23,12 +24,16 @@ class DiagnosticUnavailable(Exception):
     """The model did not return a usable AemDiagnostic."""
 
 def diagnose(context: str) -> AemDiagnostic:
-    response = client.responses.parse(
-        model="gpt-5.6-luna",
-        instructions=INSTRUCTIONS,
-        input=f"Diagnostic context:\n{context}",
-        text_format=AemDiagnostic,
-    )
+    try:
+        response = client.responses.parse(
+            model="gpt-5.6-luna",
+            instructions=INSTRUCTIONS,
+            input=f"Diagnostic context:\n{context}",
+            text_format=AemDiagnostic,
+        )
+    except ValidationError as e:
+        raise DiagnosticUnavailable("model returned data outside the contract") from e
+
     diagnostic = response.output_parsed
     if diagnostic is None:
         raise DiagnosticUnavailable(f"no parsed output (status={response.status})")
