@@ -1,4 +1,5 @@
 from enum import Enum
+from openai.types.responses import FunctionToolParam
 
 from pydantic import BaseModel
 
@@ -25,11 +26,11 @@ class ComponentStatus(BaseModel):
     unsatisfied_references: list[str]
 
 
-GET_BUNDLE_STATUS_TOOL = {
+GET_BUNDLE_STATUS_TOOL: FunctionToolParam = {
     "type": "function",
     "name": "get_bundle_status",
     "description": (
-        "Look up the runtime status of one OSGI bundle in the AEM instance. "
+        "Look up the runtime status of one OSGi bundle in the AEM instance. "
         "Returns its state (ACTIVE, RESOLVED or INSTALLED), version, and any "
         "unresolved Import-Package problems. Use it when a bundle may not be "
         "running or when a component's dependency may come from a broken bundle"
@@ -43,6 +44,30 @@ GET_BUNDLE_STATUS_TOOL = {
             }
         },
         "required": ["symbolic_name"],
+        "additionalProperties": False,
+    },
+    "strict": True
+}
+
+GET_COMPONENT_STATUS_TOOL: FunctionToolParam = {
+    "type": "function",
+    "name": "get_component_status",
+    "description": (
+        "Look up the runtime status of one OSGi Declarative Services (DS) component "
+        "in the AEM instance. Returns its state (ACTIVE, SATISFIED or "
+        "UNSATISFIED_REFERENCE) and the list of references it cannot satisfy. "
+        "Use it when a service is missing, a job is not running, or a component "
+        "is reported as unsatisfied, even if its bundle is ACTIVE."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "component_name": {
+                "type": "string",
+                "description": "Fully qualified DS component name, e.g. 'com.acme.translation.core.scheduler.TranslationSchedulerJob'"
+            }
+        },
+        "required": ["component_name"],
         "additionalProperties": False,
     },
     "strict": True

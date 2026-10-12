@@ -23,7 +23,7 @@ _COMPONENTS: dict[str, ComponentStatus] = {
     ),
     "com.acme.translation.core.scheduler.TranslationSchedulerJob": ComponentStatus(
         name="com.acme.translation.core.scheduler.TranslationSchedulerJob",
-        state=ComponentState.UNSATISFIED_REFENCE,
+        state=ComponentState.UNSATISFIED_REFERENCE,
         unsatisfied_references=["TranslationService (com.acme.translation.api.TranslationService)"]
     )
 }
