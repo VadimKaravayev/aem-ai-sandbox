@@ -1,7 +1,7 @@
 from enum import Enum
-from openai.types.responses import FunctionToolParam
 
-from pydantic import BaseModel
+from openai.types.responses import FunctionToolParam
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class BundleState(str, Enum):
@@ -25,6 +25,13 @@ class ComponentStatus(BaseModel):
     state: ComponentState
     unsatisfied_references: list[str]
 
+class BundleStatusArgs(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    symbolic_name: str = Field(description="Bundle symbolic name, e.g. com.acme.translation.core")
+
+class ComponentStatusArgs(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    component_name: str = Field(description="Fully qualified DS component name, e.g. 'com.acme.translation.core.scheduler.TranslationSchedulerJob'")
 
 GET_BUNDLE_STATUS_TOOL: FunctionToolParam = {
     "type": "function",
@@ -35,17 +42,7 @@ GET_BUNDLE_STATUS_TOOL: FunctionToolParam = {
         "unresolved Import-Package problems. Use it when a bundle may not be "
         "running or when a component's dependency may come from a broken bundle"
     ),
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "symbolic_name": {
-                "type": "string",
-                "description": "Bundle symbolic name, e.g. com.acme.translation.core"
-            }
-        },
-        "required": ["symbolic_name"],
-        "additionalProperties": False,
-    },
+    "parameters": BundleStatusArgs.model_json_schema(),
     "strict": True
 }
 
@@ -59,16 +56,6 @@ GET_COMPONENT_STATUS_TOOL: FunctionToolParam = {
         "Use it when a service is missing, a job is not running, or a component "
         "is reported as unsatisfied, even if its bundle is ACTIVE."
     ),
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "component_name": {
-                "type": "string",
-                "description": "Fully qualified DS component name, e.g. 'com.acme.translation.core.scheduler.TranslationSchedulerJob'"
-            }
-        },
-        "required": ["component_name"],
-        "additionalProperties": False,
-    },
+    "parameters": ComponentStatusArgs.model_json_schema(),
     "strict": True
 }

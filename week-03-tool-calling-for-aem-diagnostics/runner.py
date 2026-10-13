@@ -1,8 +1,7 @@
-import json
 from openai import OpenAI
 
 from contracts import GET_BUNDLE_STATUS_TOOL, GET_COMPONENT_STATUS_TOOL
-from tools import get_bundle_status, get_component_status
+from tool_registry import dispatch
 
 client = OpenAI()
 
@@ -34,14 +33,9 @@ input_items += response.output
 for item in response.output:
     if item.type != "function_call":
         continue
-    args = json.loads(item.arguments)
 
-    if item.name == "get_bundle_status":
-        result = get_bundle_status(args["symbolic_name"])
-    elif item.name == "get_component_status":
-        result = get_component_status(args["component_name"])
-    else:
-        raise ValueError(f"Unknown tool {item.name}")
+    result = dispatch(item.name, item.arguments)
+
     input_items.append({
         "type": "function_call_output",
         "call_id": item.call_id,
@@ -54,5 +48,8 @@ final = client.responses.create(
     input=input_items,
     tools=TOOLS
 )
+
+if any(item.type == "function_call" for item in final.output):
+    raise RuntimeError("Model asked for more tool calls; only one round trip is supported")
 
 print(final.output_text)

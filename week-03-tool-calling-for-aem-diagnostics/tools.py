@@ -1,4 +1,4 @@
-from contracts import BundleStatus, BundleState, ComponentStatus, ComponentState
+from contracts import BundleState, BundleStatus, ComponentState, ComponentStatus
 
 _BUNDLES: dict[str, BundleStatus] = {
     "com.acme.core": BundleStatus(
